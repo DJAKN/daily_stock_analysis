@@ -137,6 +137,7 @@ jobs:
           # ==========================================
           # 系统配置
           # ==========================================
+          TZ: Asia/Tokyo  # UTC+9 时区（日本/韩国）
           LOG_LEVEL: INFO
           MAX_WORKERS: ${{ vars.MAX_WORKERS || secrets.MAX_WORKERS || '1' }}
           # GitHub Actions 环境建议关闭不稳定的数据源
