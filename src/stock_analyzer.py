@@ -843,5 +843,5 @@ if __name__ == "__main__":
     })
     
     analyzer = StockTrendAnalyzer()
-    result = analyzer.analyze(df, '000001')
+    result = analyzer.analyze(df, 'AAPL')
     print(analyzer.format_analysis(result))

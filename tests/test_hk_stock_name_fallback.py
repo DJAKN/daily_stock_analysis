@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import pytest; pytest.importorskip("data_provider.akshare_fetcher")  # skip if A-share fetcher removed
+
 """
 Regression tests for HK stock name fallback when stock_hk_spot_em fails.
 

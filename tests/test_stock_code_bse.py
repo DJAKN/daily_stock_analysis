@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import pytest; pytest.importorskip("data_provider.akshare_fetcher")  # skip if A-share fetcher removed
+
 """
 Unit tests for BSE (Beijing Stock Exchange) code recognition (Issue #491).
 

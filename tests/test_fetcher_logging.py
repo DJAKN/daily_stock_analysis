@@ -1,3 +1,5 @@
+import pytest; pytest.importorskip("data_provider.efinance_fetcher")  # skip if A-share fetcher removed
+
 import logging
 import os
 import sys

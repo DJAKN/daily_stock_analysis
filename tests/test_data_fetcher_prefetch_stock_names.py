@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import pytest; pytest.importorskip("data_provider.pytdx_fetcher")  # skip if A-share fetcher removed
+
 """
 Regression tests for stock-name prefetch behavior.
 """

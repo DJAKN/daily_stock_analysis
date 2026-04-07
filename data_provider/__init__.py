@@ -31,13 +31,31 @@
 """
 
 from .base import BaseFetcher, DataFetcherManager
-from .efinance_fetcher import EfinanceFetcher
-from .akshare_fetcher import AkshareFetcher, is_hk_stock_code
-from .tushare_fetcher import TushareFetcher
-from .pytdx_fetcher import PytdxFetcher
-from .baostock_fetcher import BaostockFetcher
 from .yfinance_fetcher import YfinanceFetcher
 from .longbridge_fetcher import LongbridgeFetcher
+
+# A-share fetchers removed in US market migration; import guards for backward compatibility
+try:
+    from .efinance_fetcher import EfinanceFetcher
+except ImportError:
+    EfinanceFetcher = None
+try:
+    from .akshare_fetcher import AkshareFetcher, is_hk_stock_code
+except ImportError:
+    AkshareFetcher = None
+    is_hk_stock_code = lambda code: code.upper().startswith('HK')
+try:
+    from .tushare_fetcher import TushareFetcher
+except ImportError:
+    TushareFetcher = None
+try:
+    from .pytdx_fetcher import PytdxFetcher
+except ImportError:
+    PytdxFetcher = None
+try:
+    from .baostock_fetcher import BaostockFetcher
+except ImportError:
+    BaostockFetcher = None
 from .us_index_mapping import is_us_index_code, is_us_stock_code, get_us_index_yf_symbol, US_INDEX_MAPPING
 
 __all__ = [

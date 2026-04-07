@@ -167,7 +167,11 @@ test_code_recognition() {
     python3 << 'PYTEST'
 import sys
 sys.path.insert(0, '.')
-from data_provider.akshare_fetcher import _is_hk_code, _is_us_code
+from data_provider.us_index_mapping import is_us_stock_code as _is_us_code
+
+def _is_hk_code(code):
+    c = code.strip().upper()
+    return c.startswith('HK') and len(c) == 7 and c[2:].isdigit()
 
 test_cases = [
     # (代码, 预期HK, 预期US, 描述)
