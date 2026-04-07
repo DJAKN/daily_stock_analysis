@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===================================
-A股自选股智能分析系统 - 搜索服务模块
+美股智能分析系统 - 搜索服务模块
 ===================================
 
 职责：
@@ -3253,8 +3253,8 @@ class SearchService:
         """
         Enhance search when data sources fail.
         
-        When all data sources (efinance, akshare, tushare, baostock, etc.) fail to get
-        stock data, use search engines to find stock trends and price info as supplemental data for AI analysis.
+        When data sources fail to get stock data, use search engines to find
+        stock trends and price info as supplemental data for AI analysis.
         
         Strategy:
         1. Search using multiple keyword templates
@@ -3470,7 +3470,7 @@ if __name__ == "__main__":
     
     if service.is_available:
         print("=== 测试股票新闻搜索 ===")
-        response = service.search_stock_news("300389", "艾比森")
+        response = service.search_stock_news("AAPL", "Apple")
         print(f"搜索状态: {'成功' if response.success else '失败'}")
         print(f"搜索引擎: {response.provider}")
         print(f"结果数量: {len(response.results)}")

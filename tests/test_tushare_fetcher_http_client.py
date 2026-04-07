@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import pytest; pytest.importorskip("data_provider.tushare_fetcher")  # skip if A-share fetcher removed
+
 """Regression tests for TushareFetcher HTTP client initialization."""
 
 import importlib.util

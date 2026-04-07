@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===================================
-A股自选股智能分析系统 - 存储层
+美股智能分析系统 - 存储层
 ===================================
 
 职责：
@@ -77,7 +77,7 @@ class StockDaily(Base):
     # 主键
     id = Column(Integer, primary_key=True, autoincrement=True)
     
-    # 股票代码（如 600519, 000001）
+    # 股票代码（如 AAPL, TSLA）
     code = Column(String(10), nullable=False, index=True)
     
     # 交易日期
@@ -101,7 +101,7 @@ class StockDaily(Base):
     volume_ratio = Column(Float)  # 量比
     
     # 数据来源
-    data_source = Column(String(50))  # 记录数据来源（如 AkshareFetcher）
+    data_source = Column(String(50))  # 记录数据来源（如 YfinanceFetcher）
     
     # 更新时间
     created_at = Column(DateTime, default=datetime.now)
@@ -2147,28 +2147,28 @@ if __name__ == "__main__":
     print(f"数据库初始化成功")
     
     # 测试检查今日数据
-    has_data = db.has_today_data('600519')
-    print(f"茅台今日是否有数据: {has_data}")
-    
+    has_data = db.has_today_data('AAPL')
+    print(f"AAPL 今日是否有数据: {has_data}")
+
     # 测试保存数据
     test_df = pd.DataFrame({
         'date': [date.today()],
-        'open': [1800.0],
-        'high': [1850.0],
-        'low': [1780.0],
-        'close': [1820.0],
-        'volume': [10000000],
-        'amount': [18200000000],
+        'open': [180.0],
+        'high': [185.0],
+        'low': [178.0],
+        'close': [182.0],
+        'volume': [50000000],
+        'amount': [9100000000],
         'pct_chg': [1.5],
-        'ma5': [1810.0],
-        'ma10': [1800.0],
-        'ma20': [1790.0],
+        'ma5': [181.0],
+        'ma10': [180.0],
+        'ma20': [179.0],
         'volume_ratio': [1.2],
     })
-    
-    saved = db.save_daily_data(test_df, '600519', 'TestSource')
+
+    saved = db.save_daily_data(test_df, 'AAPL', 'TestSource')
     print(f"保存测试数据: {saved} 条")
-    
+
     # 测试获取上下文
-    context = db.get_analysis_context('600519')
+    context = db.get_analysis_context('AAPL')
     print(f"分析上下文: {context}")

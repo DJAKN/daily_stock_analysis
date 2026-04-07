@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===================================
-A股自选股智能分析系统 - 环境验证测试
+美股智能分析系统 - 环境验证测试
 ===================================
 
 用于验证 .env 配置是否正确，包括：
@@ -71,10 +71,6 @@ def test_config():
     print(f"  调试模式: {config.debug}")
     
     print_section("API 配置")
-    print(f"  Tushare Token: {'已配置 ✓' if config.tushare_token else '未配置 ✗'}")
-    if config.tushare_token:
-        print(f"    Token 前8位: {config.tushare_token[:8]}...")
-    
     print(f"  Gemini API Key: {'已配置 ✓' if config.gemini_api_key else '未配置 ✗'}")
     if config.gemini_api_key:
         print(f"    Key 前8位: {config.gemini_api_key[:8]}...")
@@ -336,7 +332,7 @@ def test_notification():
     
     test_message = f"""## 🧪 系统测试消息
 
-这是一条来自 **A股自选股智能分析系统** 的测试消息。
+这是一条来自 **美股智能分析系统** 的测试消息。
 
 - 测试时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 - 测试目的: 验证企业微信 Webhook 配置
@@ -363,7 +359,7 @@ def test_notification():
 def run_all_tests():
     """运行所有测试"""
     print("\n" + "🚀" * 20)
-    print("  A股自选股智能分析系统 - 环境验证")
+    print("  美股智能分析系统 - 环境验证")
     print("  " + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     print("🚀" * 20)
     
@@ -436,7 +432,7 @@ def query_stock_data(stock_code: str, days: int = 10):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='A股自选股智能分析系统 - 环境验证测试',
+        description='美股智能分析系统 - 环境验证测试',
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     

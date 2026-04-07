@@ -25,8 +25,8 @@ class AnalyzeCommand(BotCommand):
     分析指定股票代码，生成 AI 分析报告并推送。
     
     用法：
-        /analyze 600519       - 分析贵州茅台（精简报告）
-        /analyze 600519 full  - 分析并生成完整报告
+        /analyze AAPL         - 分析苹果
+        /analyze TSLA full    - 分析特斯拉并生成完整报告
     """
     
     @property

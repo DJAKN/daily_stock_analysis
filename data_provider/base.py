@@ -855,34 +855,35 @@ class DataFetcherManager:
           4. YfinanceFetcher (Priority 4)
           5. LongbridgeFetcher (Priority 5) - 长桥（美股/港股兜底）
         """
-        from .efinance_fetcher import EfinanceFetcher
-        from .akshare_fetcher import AkshareFetcher
-        from .tushare_fetcher import TushareFetcher
-        from .pytdx_fetcher import PytdxFetcher
-        from .baostock_fetcher import BaostockFetcher
         from .yfinance_fetcher import YfinanceFetcher
         from .longbridge_fetcher import LongbridgeFetcher
-        # 创建所有数据源实例（优先级在各 Fetcher 的 __init__ 中确定）
-        efinance = EfinanceFetcher()
-        akshare = AkshareFetcher()
-        tushare = TushareFetcher()  # 会根据 Token 配置自动调整优先级
-        pytdx = PytdxFetcher()      # 通达信数据源（可配 PYTDX_HOST/PYTDX_PORT）
-        baostock = BaostockFetcher()
+
+        # 创建可用的数据源实例
+        fetcher_list = []
+        # A-share fetchers removed in US market migration; try-import for backward compat
+        for fetcher_import in [
+            ('efinance_fetcher', 'EfinanceFetcher'),
+            ('akshare_fetcher', 'AkshareFetcher'),
+            ('tushare_fetcher', 'TushareFetcher'),
+            ('pytdx_fetcher', 'PytdxFetcher'),
+            ('baostock_fetcher', 'BaostockFetcher'),
+        ]:
+            try:
+                mod = __import__(f'data_provider.{fetcher_import[0]}', fromlist=[fetcher_import[1]])
+                cls = getattr(mod, fetcher_import[1])
+                fetcher_list.append(cls())
+            except (ImportError, Exception) as e:
+                logger.debug(f"跳过不可用的数据源 {fetcher_import[1]}: {e}")
+
         yfinance = YfinanceFetcher()
-        longbridge = LongbridgeFetcher()  # 长桥（美股/港股兜底，懒加载）
+        longbridge = LongbridgeFetcher()
+
+        fetcher_list.extend([yfinance, longbridge])
 
         # 初始化数据源列表
         self._ensure_concurrency_guards()
         with self._fetchers_lock:
-            self._fetchers = [
-                efinance,
-                akshare,
-                tushare,
-                pytdx,
-                baostock,
-                yfinance,
-                longbridge,
-            ]
+            self._fetchers = fetcher_list
 
             # 按优先级排序（Tushare 如果配置了 Token 且初始化成功，优先级为 0）
             self._fetchers.sort(key=lambda f: f.priority)
@@ -1145,7 +1146,7 @@ class DataFetcherManager:
         # Normalize code (strip SH/SZ prefix etc.)
         stock_code = normalize_stock_code(stock_code)
 
-        from .akshare_fetcher import _is_us_code
+        from .us_index_mapping import is_us_stock_code as _is_us_code
         from .us_index_mapping import is_us_index_code
         from src.config import get_config
 
@@ -1480,7 +1481,7 @@ class DataFetcherManager:
             return self._cache_stock_name(stock_code, static_name) or static_name
 
         # 3. 依次尝试各个数据源
-        from .akshare_fetcher import _is_us_code
+        from .us_index_mapping import is_us_stock_code as _is_us_code
         is_us = _is_us_code(stock_code)
         _US_CAPABLE_FETCHERS = {"YfinanceFetcher", "LongbridgeFetcher"}
         for fetcher in self._get_fetchers_snapshot():
