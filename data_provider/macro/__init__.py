@@ -8,6 +8,7 @@ and fetchers for FRED (indicators) and Finnhub (calendar).
 
 from .types import MacroIndicator, EconEvent, UnifiedMacroSnapshot
 from .base import BaseMacroIndicatorFetcher, BaseMacroCalendarFetcher
+from .manager import MacroManager
 
 __all__ = [
     "MacroIndicator",
@@ -15,4 +16,5 @@ __all__ = [
     "UnifiedMacroSnapshot",
     "BaseMacroIndicatorFetcher",
     "BaseMacroCalendarFetcher",
+    "MacroManager",
 ]
