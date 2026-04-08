@@ -55,7 +55,13 @@ jobs:
       - name: 创建必要目录
         run: |
           mkdir -p data logs reports
-      
+
+      - name: Restore analysis data cache
+        uses: actions/cache@v4
+        with:
+          path: data/
+          key: analysis-data-${{ runner.os }}
+
       - name: 执行股票分析
         env:
           # ==========================================
@@ -98,7 +104,16 @@ jobs:
           BRAVE_API_KEYS: ${{ secrets.BRAVE_API_KEYS }}
           SEARXNG_BASE_URLS: ${{ secrets.SEARXNG_BASE_URLS }}
           SEARXNG_PUBLIC_INSTANCES_ENABLED: ${{ vars.SEARXNG_PUBLIC_INSTANCES_ENABLED || secrets.SEARXNG_PUBLIC_INSTANCES_ENABLED }}
-          
+
+          # ==========================================
+          # 数据源 (Data Providers)
+          # ==========================================
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          SEC_EDGAR_USER_AGENT: ${{ vars.SEC_EDGAR_USER_AGENT || secrets.SEC_EDGAR_USER_AGENT }}
+
           # ==========================================
           # 通知渠道（可同时配置多个，全部推送）
           # ==========================================
@@ -211,6 +226,11 @@ jobs:
           echo "【数据源】"
           echo "  Tushare Token: $([ -n "$TUSHARE_TOKEN" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
           echo "  Longbridge: $([ -n "$LONGBRIDGE_APP_KEY" ] && [ -n "$LONGBRIDGE_APP_SECRET" ] && [ -n "$LONGBRIDGE_ACCESS_TOKEN" ] && echo '✅ 已配置（美股/港股行情补充）' || echo '⚪ 未配置（仅 YFinance 等，无长桥调用）')"
+          echo "  FMP: $([ -n "$FMP_API_KEY" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
+          echo "  Finnhub: $([ -n "$FINNHUB_API_KEY" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
+          echo "  Alpha Vantage: $([ -n "$ALPHA_VANTAGE_API_KEY" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
+          echo "  FRED: $([ -n "$FRED_API_KEY" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
+          echo "  SEC EDGAR: ✅ 免密钥（仅需 User-Agent）"
           echo ""
           echo "【搜索引擎】"
           echo "  Bocha API Keys: $([ -n "$BOCHA_API_KEYS" ] && echo '✅ 已配置' || echo '⚪ 未配置')"
