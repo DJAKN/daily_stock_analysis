@@ -8,5 +8,6 @@ for US stock market news (Finnhub, FMP, SEC EDGAR, search adapter).
 
 from .types import UnifiedNewsItem, NewsEventType
 from .base import BaseNewsFetcher
+from .manager import NewsManager
 
-__all__ = ["UnifiedNewsItem", "NewsEventType", "BaseNewsFetcher"]
+__all__ = ["UnifiedNewsItem", "NewsEventType", "BaseNewsFetcher", "NewsManager"]
