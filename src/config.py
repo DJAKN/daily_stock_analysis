@@ -764,6 +764,15 @@ class Config:
     # CONFIG_VALIDATE_MODE=strict: exit(1) when any "error" severity issue is found
     config_validate_mode: str = "warn"
 
+    # === Data Provider API keys (US market, all optional) ===
+    fmp_api_key: str = ""
+    finnhub_api_key: str = ""
+    alpha_vantage_api_key: str = ""
+    fred_api_key: str = ""
+    sec_edgar_user_agent: str = ""
+    provider_cache_enabled: bool = True
+    provider_cache_dir: str = "./data/provider_cache.db"
+
     # --- Post-init validation ---------------------------------------------------
     _VALID_AGENT_ARCH = {"single", "multi"}
     _VALID_ORCHESTRATOR_MODES = {"quick", "standard", "full", "specialist"}
@@ -1425,7 +1434,15 @@ class Config:
                 field_name='PORTFOLIO_RISK_LOOKBACK_DAYS',
                 minimum=1,
             ),
-            portfolio_fx_update_enabled=os.getenv('PORTFOLIO_FX_UPDATE_ENABLED', 'true').lower() == 'true'
+            portfolio_fx_update_enabled=os.getenv('PORTFOLIO_FX_UPDATE_ENABLED', 'true').lower() == 'true',
+            # Data Provider API keys (US market)
+            fmp_api_key=os.getenv('FMP_API_KEY', ''),
+            finnhub_api_key=os.getenv('FINNHUB_API_KEY', ''),
+            alpha_vantage_api_key=os.getenv('ALPHA_VANTAGE_API_KEY', ''),
+            fred_api_key=os.getenv('FRED_API_KEY', ''),
+            sec_edgar_user_agent=os.getenv('SEC_EDGAR_USER_AGENT', ''),
+            provider_cache_enabled=os.getenv('PROVIDER_CACHE_ENABLED', 'true').lower() == 'true',
+            provider_cache_dir=os.getenv('PROVIDER_CACHE_DIR', './data/provider_cache.db'),
         )
     
     @classmethod
