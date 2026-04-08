@@ -8,5 +8,6 @@ for US stock market data (FMP, Finnhub, Alpha Vantage, SEC EDGAR).
 
 from .types import UnifiedFundamentalData
 from .base import BaseFundamentalFetcher
+from .manager import FundamentalManager
 
-__all__ = ["UnifiedFundamentalData", "BaseFundamentalFetcher"]
+__all__ = ["UnifiedFundamentalData", "BaseFundamentalFetcher", "FundamentalManager"]
