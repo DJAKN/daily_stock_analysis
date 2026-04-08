@@ -154,6 +154,33 @@ class StockAnalysisPipeline:
             )
             self.social_sentiment_service = None
 
+        # 初始化基本面数据管理器（可选）
+        try:
+            from data_provider.fundamental.manager import FundamentalManager
+            self.fundamental_manager = FundamentalManager.from_config()
+            logger.info("FundamentalManager initialized")
+        except Exception as exc:
+            logger.warning("FundamentalManager initialization failed: %s", exc)
+            self.fundamental_manager = None
+
+        # 初始化新闻管理器（可选）
+        try:
+            from data_provider.news.manager import NewsManager
+            self.news_manager = NewsManager.from_config()
+            logger.info("NewsManager initialized")
+        except Exception as exc:
+            logger.warning("NewsManager initialization failed: %s", exc)
+            self.news_manager = None
+
+        # 初始化宏观数据管理器（可选）
+        try:
+            from data_provider.macro.manager import MacroManager
+            self.macro_manager = MacroManager.from_config()
+            logger.info("MacroManager initialized")
+        except Exception as exc:
+            logger.warning("MacroManager initialization failed: %s", exc)
+            self.macro_manager = None
+
     def _emit_progress(self, progress: int, message: str) -> None:
         """Best-effort bridge from pipeline stages to task SSE progress."""
         callback = getattr(self, "progress_callback", None)
@@ -426,6 +453,48 @@ class StockAnalysisPipeline:
                 except Exception as e:
                     logger.warning(f"{stock_name}({code}) Social sentiment fetch failed: {e}")
 
+            # Step 4.6: Fetch fundamental data from new providers (optional)
+            new_fundamental_data = None
+            if self.fundamental_manager is not None:
+                try:
+                    new_fundamental_data = self.fundamental_manager.get_fundamentals(code)
+                    if new_fundamental_data:
+                        logger.info(f"{stock_name}({code}) New fundamental data retrieved from {new_fundamental_data.source}")
+                except Exception as e:
+                    logger.warning(f"{stock_name}({code}) New fundamental data fetch failed: {e}")
+
+            # Step 4.7: Fetch financial news from new providers (optional)
+            if self.news_manager is not None:
+                try:
+                    financial_news = self.news_manager.get_financial_news(code)
+                    if financial_news:
+                        # Format as text block and append to news_context
+                        news_text = "\n\n--- Financial News (structured) ---\n"
+                        for item in financial_news[:10]:  # top 10 by relevance
+                            news_text += f"[{item.event_type.value}] {item.title} ({item.source_name}, {item.published_at.strftime('%Y-%m-%d')})\n"
+                            if item.summary:
+                                news_text += f"  {item.summary}\n"
+                        if news_context:
+                            news_context = news_context + news_text
+                        else:
+                            news_context = news_text
+                        logger.info(f"{stock_name}({code}) Financial news: {len(financial_news)} items from new providers")
+                except Exception as e:
+                    logger.warning(f"{stock_name}({code}) Financial news fetch failed: {e}")
+
+            # Step 4.8: Fetch macro context (optional, shared across stocks)
+            macro_snapshot = None
+            if self.macro_manager is not None:
+                try:
+                    # Cache macro snapshot on the pipeline instance (shared across stocks in a batch)
+                    if not hasattr(self, '_macro_snapshot_cache'):
+                        self._macro_snapshot_cache = self.macro_manager.get_snapshot()
+                    macro_snapshot = self._macro_snapshot_cache
+                    if macro_snapshot:
+                        logger.debug(f"Macro context: regime={macro_snapshot.market_regime}, {len(macro_snapshot.indicators)} indicators")
+                except Exception as e:
+                    logger.warning(f"Macro data fetch failed: {e}")
+
             # Step 5: 获取分析上下文（技术面数据）
             self._emit_progress(58, f"{stock_name}：正在整理分析上下文")
             context = self.db.get_analysis_context(code)
@@ -446,14 +515,20 @@ class StockAnalysisPipeline:
             
             # Step 6: 增强上下文数据（添加实时行情、筹码、趋势分析结果、股票名称）
             enhanced_context = self._enhance_context(
-                context, 
-                realtime_quote, 
+                context,
+                realtime_quote,
                 chip_data,
                 trend_result,
                 stock_name,  # 传入股票名称
                 fundamental_context,
             )
-            
+
+            # After _enhance_context call, add new provider data
+            if new_fundamental_data:
+                enhanced_context['new_fundamentals'] = new_fundamental_data.to_dict()
+            if macro_snapshot:
+                enhanced_context['macro'] = macro_snapshot.to_dict()
+
             # Step 7: 调用 AI 分析（传入增强的上下文和新闻）
             llm_progress_state = {"last_progress": 64}
 
