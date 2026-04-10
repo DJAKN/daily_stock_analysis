@@ -79,3 +79,6 @@ static/
 /apps/dsa-desktop/dist/
 /apps/dsa-desktop/node_modules/
 .superpowers/
+
+# Reference books (copyrighted, local only)
+books/
